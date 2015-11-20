@@ -1,0 +1,38 @@
+#!/usr/bin/python2
+# Selects a subset of samples out of pre-recorded data
+# Support for headers
+from analysis import fileman
+from optparse import OptionParser
+from gnuradio.eng_option import eng_option
+
+def get_options():
+    usage = "%prog: <input_file> <output_file>"
+    desc = "Selects a subsection of a recorded file with headers"
+    desc += "\n Assumes detached headers (for now)"
+    parser = OptionParser(usage=usage, description=desc,
+             option_class=eng_option)
+    parser.add_option("-S", "--start", type="eng_float", default=0,
+           help="Starting sample index.  Applies AFTER type conversion \
+           [default=%default]")
+    parser.add_option("-N", "--nsamples", type="eng_float",
+           help="Number of samples to output. If not specified, output all")
+    parser.add_option("-v", "--verbose", action="store_true", default=False,
+           help="Verbose Output")
+    parser.add_option("-o", "--output-type", type="choice", default="unknown",
+            choices=fileman.SNAME_TO_ENUM.keys(), help="Output data type. \
+                     [sc16|fc32|b8] Default is same as input")
+    parser.add_option("-r", "--repeat-end", action="store_true", default=False,
+	   help="Repeat until all data has been split")
+    parser.add_option("-l", "--length", type="eng_float", default=0, help = "Length of data in samples")
+    parser.add_option("-t", "--timeMode", action="store_true", default=False, help="Enter Time Mode")
+    
+                     
+    (options, args) = parser.parse_args()
+    if len(args) != 2:
+        parser.print_help()
+        raise SystemExit(1)
+    return (options, args)
+
+if __name__ == '__main__':
+    (options, args) = get_options()
+    fileman.truncate_file(options,args)
